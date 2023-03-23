@@ -4,6 +4,7 @@ from spyne import Application, rpc, ServiceBase, Unicode, Double
 from spyne.protocol.json import JsonDocument
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
+from api_keys.api_keys import VALID_API_KEYS
 
 CURRENCY_URL = 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'
 
@@ -23,9 +24,16 @@ def fetch_currency_rates():
         print("Failed to fetch currency rates. Response: " + str(response.status_code))
 
 
+def is_valid_api_key(api_key):
+    return api_key in VALID_API_KEYS
+
+
 class CurrencyConverterService(ServiceBase):
-    @rpc(Unicode, Unicode, Unicode, _returns=Double)
-    def convert(ctx, base_currency, target_currency, amount): # ctx stands for context, mandatory due to spyne. holds info about request, e.g. client ip, http method etc.
+    @rpc(Unicode, Unicode, Unicode, Unicode, _returns=Double)
+    def convert(ctx, api_key, base_currency, target_currency, amount): # ctx stands for context, mandatory due to spyne. holds info about request, e.g. client ip, http method etc.
+        if not is_valid_api_key(api_key):
+            raise ValueError("Invalid API Key")
+
         amount = float(amount)
         if base_currency == target_currency:
             return amount
@@ -56,6 +64,4 @@ if __name__ == '__main__':
     server = make_server('127.0.0.1', 8080, wsgi_application)
     print("Listening on 127.0.0.1:8080")
     server.serve_forever()
-
-
 
