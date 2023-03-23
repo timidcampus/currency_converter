@@ -1,6 +1,7 @@
 import requests
 from lxml import etree
 from spyne import Application, rpc, ServiceBase, Unicode, Double
+from spyne.protocol.json import JsonDocument
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
@@ -44,7 +45,7 @@ application = Application(
     [CurrencyConverterService],
     'CurrencyConverter',
     in_protocol=Soap11(validator='lxml'),
-    out_protocol=Soap11(),
+    out_protocol=JsonDocument()
 )
 
 wsgi_application = WsgiApplication(application) # web server gateway interface - standard interface between web service and python web applications
