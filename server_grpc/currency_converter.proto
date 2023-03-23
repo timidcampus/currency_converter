@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package currencyconverter;
+
+// The CurrencyConverter service definition.
+service CurrencyConverter {
+  // Converts an amount between two currencies.
+  rpc Convert (ConversionRequest) returns (ConversionResult) {}
+}
+
+// The request format for the Convert rpc method.
+message ConversionRequest {
+  string api_key = 1;
+  string base_currency = 2;
+  string target_currency = 3;
+  double amount = 4;
+}
+
+// The response format for the Convert rpc method.
+message ConversionResult {
+  double value = 1;
+}
