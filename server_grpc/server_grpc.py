@@ -58,7 +58,7 @@ def serve():
     currency_converter_pb2_grpc.add_CurrencyConverterServicer_to_server(CurrencyConverter(), server)
     server.add_insecure_port('[::]:8080')
     server.start()
-    print("Listening on 0.0.0.0:8080")
+    print("Listening on localhost:8080")
     server.wait_for_termination()
 
 
