@@ -10,7 +10,7 @@ def run():
     api_key = 'apikey1'
     base_currency = 'USD'
     target_currency = 'EUR'
-    amount = 100.0
+    amount = 250.0
     request = currency_converter_pb2.ConversionRequest(
         api_key=api_key,
         base_currency=base_currency,
