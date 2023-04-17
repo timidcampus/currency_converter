@@ -28,6 +28,7 @@ def is_valid_api_key(api_key):
     return api_key in VALID_API_KEYS
 
 
+# http://spyne.io/#inprot=HttpRpc&outprot=JsonDocument&s=rpc&tpt=WsgiApplication&validator=true
 class CurrencyConverterService(ServiceBase):
     @rpc(Unicode, Unicode, Unicode, Unicode, _returns=Double)
     def convert(ctx, api_key, base_currency, target_currency, amount): # ctx stands for context, mandatory due to spyne. holds info about request, e.g. client ip, http method etc.
