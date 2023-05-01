@@ -5,6 +5,9 @@ from spyne.protocol.json import JsonDocument
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 from api_keys.api_keys import VALID_API_KEYS
+import sys
+
+sys.path.insert(0, "/tmp/currency_converter")
 
 CURRENCY_URL = 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'
 
