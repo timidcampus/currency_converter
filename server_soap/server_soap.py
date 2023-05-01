@@ -66,7 +66,7 @@ wsgi_application = WsgiApplication(application) # web server gateway interface -
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
 
-    server = make_server('127.0.0.1', 8080, wsgi_application)
-    print("Listening on 127.0.0.1:8080")
+    server = make_server('', 8080, wsgi_application)
+    print("Listening on port 8080")
     server.serve_forever()
 
