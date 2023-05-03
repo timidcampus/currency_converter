@@ -51,7 +51,7 @@ class CurrencyConverterService(ServiceBase):
         base_rate = rates[base_currency]
         target_rate = rates[target_currency]
 
-        return (amount / base_rate) * target_rate
+        return round((amount / base_rate) * target_rate,2)
 
 
 application = Application(
