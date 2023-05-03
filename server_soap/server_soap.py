@@ -65,7 +65,7 @@ class CurrencyConverterService(ServiceBase):
         base_rate = rates[base_currency]
         target_rate = rates[target_currency]
 
-        return round((amount / base_rate) * target_rate,2)
+        return round((amount / base_rate) * target_rate, 2)
 
     @rpc(Unicode, _returns=Iterable(Unicode))
     def available_currencies(ctx, api_key):
@@ -91,4 +91,3 @@ if __name__ == '__main__':
     server = make_server('', 8080, wsgi_application)
     print("Listening on port 8080")
     server.serve_forever()
-
