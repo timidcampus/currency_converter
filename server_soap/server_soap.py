@@ -1,6 +1,7 @@
 import requests
 from lxml import etree
 from spyne import Application, rpc, ServiceBase, Unicode, Double
+from spyne.model.complex import Iterable
 from spyne.protocol.json import JsonDocument
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
@@ -18,7 +19,8 @@ def fetch_currency_rates():
     if response.status_code == 200:
         xml_tree = etree.fromstring(response.content)
         namespace = {'ns': 'http://www.ecb.int/vocabulary/2002-08-01/eurofxref'}
-        rates = xml_tree.xpath('//ns:Cube[@currency and @rate]', namespaces=namespace) # more https://lxml.de/xpathxslt.html#the-xpath-method
+        rates = xml_tree.xpath('//ns:Cube[@currency and @rate]',
+                               namespaces=namespace)  # more https://lxml.de/xpathxslt.html#the-xpath-method
         rate_dict = {}
         for rate in rates:
             rate_dict[rate.attrib['currency']] = float(rate.attrib['rate'])
@@ -28,6 +30,17 @@ def fetch_currency_rates():
         print("Failed to fetch currency rates. Response: " + str(response.status_code))
 
 
+def fetch_currencies():
+    response = requests.get(CURRENCY_URL)
+    if response.status_code == 200:
+        xml_tree = etree.fromstring(response.content)
+        namespace = {'ns': 'http://www.ecb.int/vocabulary/2002-08-01/eurofxref'}
+        currencies = xml_tree.xpath('//ns:Cube[@currency]', namespaces=namespace)
+        return [currency.attrib['currency'] for currency in currencies]
+    else:
+        print("Failed to fetch currencies. Response: " + str(response.status_code))
+
+
 def is_valid_api_key(api_key):
     return api_key in VALID_API_KEYS
 
@@ -35,7 +48,8 @@ def is_valid_api_key(api_key):
 # http://spyne.io/#inprot=HttpRpc&outprot=JsonDocument&s=rpc&tpt=WsgiApplication&validator=true
 class CurrencyConverterService(ServiceBase):
     @rpc(Unicode, Unicode, Unicode, Unicode, _returns=Double)
-    def convert(ctx, api_key, base_currency, target_currency, amount): # ctx stands for context, mandatory due to spyne. holds info about request, e.g. client ip, http method etc.
+    def convert(ctx, api_key, base_currency, target_currency,
+                amount):  # ctx stands for context, mandatory due to spyne. holds info about request, e.g. client ip, http method etc.
         if not is_valid_api_key(api_key):
             raise ValueError("Invalid API Key")
 
@@ -53,6 +67,13 @@ class CurrencyConverterService(ServiceBase):
 
         return round((amount / base_rate) * target_rate,2)
 
+    @rpc(Unicode, _returns=Iterable(Unicode))
+    def available_currencies(ctx, api_key):
+        if not is_valid_api_key(api_key):
+            raise ValueError("Invalid API Key")
+
+        return fetch_currencies()
+
 
 application = Application(
     [CurrencyConverterService],
@@ -61,7 +82,8 @@ application = Application(
     out_protocol=JsonDocument()
 )
 
-wsgi_application = WsgiApplication(application) # web server gateway interface - standard interface between web service and python web applications
+wsgi_application = WsgiApplication(
+    application)  # web server gateway interface - standard interface between web service and python web applications
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
